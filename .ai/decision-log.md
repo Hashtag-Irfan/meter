@@ -29,3 +29,10 @@ This document tracks all critical design decisions made during the METER project
 - **Status**: Approved.
 - **Context**: A global `shared` package coupled database configuration with theme variables.
 - **Rationale**: Visual theme constants (e.g. sidebar width, chart colors) are moved to `@meter/ui`. Types and constants are moved to their respective package domains (e.g. `@meter/storage`) to prevent global Turborepo cache invalidations on minor UI modifications.
+
+---
+
+## 5. Pure Stateless Logic for Analytics Engine (`@meter/analytics`)
+- **Status**: Approved.
+- **Context**: Deciding how to aggregate developer metrics and qualitative insights for chart rendering.
+- **Rationale**: To maximize performance and decoupling, `@meter/analytics` is implemented as a 100% pure, stateless, zero-side-effect library. It has no references to storage APIs or external states, operating purely on arrays of `Event` and `Session` objects. Time-series bucket calculation aligns to strict UTC boundaries, dynamically filling empty gaps with 0 values so that charting components (`Recharts`) can render continuous lines without formatting gaps or visual errors. Qualitative insights use local rule-based heuristics rather than AI/LLM layers to preserve privacy and speed.
