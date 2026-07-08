@@ -1,0 +1,33 @@
+{
+  "name": "@meter/extension",
+  "version": "0.0.1",
+  "private": true,
+  "description": "METER Chrome extension — Manifest V3 side panel",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@meter/providers": "workspace:*",
+    "@meter/shared": "workspace:*",
+    "@meter/storage": "workspace:*",
+    "@meter/ui": "workspace:*",
+    "framer-motion": "^11.15.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^2.0.0-beta.26",
+    "@types/chrome": "^0.0.295",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7"
+  }
+}
