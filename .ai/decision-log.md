@@ -146,3 +146,10 @@ This document tracks all critical design decisions made during the METER project
 - **Context**: Design specifications for repository query limits, error payloads, and real-time cross-tab synchronization.
 - **Rationale**: We define strict TypeScript interfaces for repositories supporting limit/offset options, a custom `MeterError` class with dedicated error codes, and a `BroadcastChannel` synchronization event model. This guarantees thread coordination during file ingestion.
 
+---
+
+## 19. Senior Open Source Governance & Commitlint Specifications
+- **Status**: Approved.
+- **Context**: Design specifications for community PR templates, security incident reporting, and standardized Commitlint rules.
+- **Rationale**: We configure explicit Conventional Commit rules with strict type and scope validations, establish standard PR checklists (lint, typecheck, WCAG 2.1 AA audits), and formulate security reporting channels to manage vulnerabilities privately prior to coordinated disclosures.
+
