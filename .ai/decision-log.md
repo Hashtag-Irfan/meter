@@ -71,3 +71,10 @@ This document tracks all critical design decisions made during the METER project
 - **Status**: Approved.
 - **Context**: Designing the dashboard visually to look modern, vibrant, and cohesive while preventing style drift.
 - **Rationale**: We establish a unified CSS custom property architecture centered around a dark-mode-first HSL palette. Core layouts rely on glassmorphism visual styling (blur filters, fine border cards, backdrop washes) to look clean and premium. All interactive components must implement WCAG 2.1 AA contrast standards, keyboard focus rings, and screen-reader `aria-` attributes, with styling adjustments respecting users' reduced-motion preferences.
+
+---
+
+## 10. Internal Package APIs & Event-Driven Synchronization
+- **Status**: Approved.
+- **Context**: Standardizing communication patterns and method signatures across storage, analytics, provider registry, and extensions to prevent structural drift.
+- **Rationale**: We define strict TypeScript interfaces for storage repositories (`SessionsRepository`, `EventsRepository`) and stateless analytics engines (`calculateMetrics`, `generateTimeSeries`, `generateInsights`). Extension messaging uses declarative `ExtensionMessage` JSON envelopes, and local backup exports enforce a versioned JSON schema. The provider parser lifecycle tracks state transitions (`Unloaded` -> `Loaded` -> `Initialized` -> `Active` -> `Error`), guaranteeing sandbox isolation.
