@@ -138,3 +138,11 @@ This document tracks all critical design decisions made during the METER project
 - **Status**: Approved.
 - **Context**: Documenting the explicit HTML structure, Tailwind utility lists, and focus ring offset constants for reusable components (Metric Cards, Session Cards, Chronological Timelines) to prevent style drift across layout packages.
 - **Rationale**: We specify high-fidelity component layouts featuring absolute-positioned weekly sparklines, grid-aligned statistics metrics, and vertical step chronological indicators. This locks down focus-visible outline states, key mappings for dialog loops, and sliding CSS transitions, guaranteeing a premium developer experience.
+
+---
+
+## 18. Senior API Specifications & Structured Error Contracts
+- **Status**: Approved.
+- **Context**: Design specifications for repository query limits, error payloads, and real-time cross-tab synchronization.
+- **Rationale**: We define strict TypeScript interfaces for repositories supporting limit/offset options, a custom `MeterError` class with dedicated error codes, and a `BroadcastChannel` synchronization event model. This guarantees thread coordination during file ingestion.
+
