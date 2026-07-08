@@ -107,3 +107,13 @@ This document tracks all critical design decisions made during the METER project
   2. **Vite Consolidation**: Unify dashboard and extension apps under a single Vite compiler.
   3. **Web Worker Offloading**: Run log parsing and SQLite WASM inside a background Web Worker to preserve main thread framerates.
   4. **Cross-Tab Sync**: Use the Broadcast Channel API to synchronize storage updates across active tabs in real-time.
+
+---
+
+## 14. Principal Security Controls (Strict CSP, WebCrypto AES-GCM, and Sandboxed Iframes)
+- **Status**: Approved.
+- **Context**: Design specifications for mitigating prompt/code leakage, dynamic plugin exploits, and data exfiltration.
+- **Rationale**: We enforce three core security mitigations:
+  1. **Network-Free CSP**: Declare `connect-src 'none'` inside Manifest V3 extension pages, blocking all data exfiltration pathways.
+  2. **WebCrypto Database Encryption**: Allow users to encrypt local IndexedDB files using AES-GCM-256 with key derivation (PBKDF2) from a volatile user passphrase.
+  3. **Sandboxed Iframes**: Dynamic Javascript parsers are executed inside a hidden, privilege-free iframe to prevent access to DOM or extension APIs.
