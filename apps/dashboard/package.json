@@ -11,8 +11,8 @@
     "lint": "next lint --max-warnings 0",
     "lint:fix": "next lint --fix",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
+    "test": "vitest run --passWithNoTests",
+    "test:coverage": "vitest run --passWithNoTests --coverage",
     "clean": "rimraf .next dist"
   },
   "dependencies": {

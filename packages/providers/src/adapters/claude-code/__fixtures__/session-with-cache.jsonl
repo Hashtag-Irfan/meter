@@ -1,0 +1,6 @@
+{"type":"user","timestamp":"2025-06-16T14:00:00.000Z","session_id":"sess_xyz789","cwd":"/home/user/api-project","message":{"role":"user","content":"Write a REST API"},"model":"claude-opus-4-5"}
+{"type":"assistant","timestamp":"2025-06-16T14:00:05.800Z","session_id":"sess_xyz789","cwd":"/home/user/api-project","usage":{"input_tokens":200,"output_tokens":3500,"cache_read_input_tokens":500,"cache_creation_input_tokens":200},"duration_ms":5800,"model":"claude-opus-4-5"}
+{"type":"user","timestamp":"2025-06-16T14:10:00.000Z","session_id":"sess_xyz789","cwd":"/home/user/api-project","message":{"role":"user","content":"Add authentication"},"model":"claude-opus-4-5"}
+{"type":"assistant","timestamp":"2025-06-16T14:10:09.100Z","session_id":"sess_xyz789","cwd":"/home/user/api-project","usage":{"input_tokens":4000,"output_tokens":2800,"cache_read_input_tokens":3500,"cache_creation_input_tokens":0},"duration_ms":9100,"model":"claude-opus-4-5"}
+{"type":"tool_result","timestamp":"2025-06-16T14:12:00.000Z","session_id":"sess_xyz789","cwd":"/home/user/api-project"}
+{"type":"tool_result","timestamp":"2025-06-16T14:13:00.000Z","session_id":"sess_xyz789","cwd":"/home/user/api-project"}

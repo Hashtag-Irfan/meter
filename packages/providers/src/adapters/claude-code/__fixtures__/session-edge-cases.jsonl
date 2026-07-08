@@ -1,0 +1,5 @@
+not valid json at all
+{"type":"user","timestamp":"2025-06-17T10:00:00.000Z","session_id":"sess_edge1","cwd":"/home/user/project"}
+{"completely":"unexpected","fields":"only","no_type":true}
+{"type":"assistant","session_id":"sess_edge1"}
+{"type":"assistant","timestamp":1750150800000,"session_id":"sess_edge1","cwd":"/home/user/project","usage":{"input_tokens":100,"output_tokens":200},"duration_ms":1200}

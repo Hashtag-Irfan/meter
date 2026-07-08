@@ -1,0 +1,8 @@
+{"type":"session_start","timestamp":"2025-06-15T09:00:00.000Z","session_id":"sess_abc123","cwd":"/home/user/my-project","model":"claude-sonnet-4-5"}
+{"type":"user","timestamp":"2025-06-15T09:00:05.000Z","session_id":"sess_abc123","cwd":"/home/user/my-project","message":{"role":"user","content":"Can you help me refactor this function to use async/await?"},"model":"claude-sonnet-4-5"}
+{"type":"assistant","timestamp":"2025-06-15T09:00:08.500Z","session_id":"sess_abc123","cwd":"/home/user/my-project","message":{"role":"assistant","content":"Sure! Here's the refactored version using async/await..."},"usage":{"input_tokens":150,"output_tokens":820,"cache_read_input_tokens":0,"cache_creation_input_tokens":0},"duration_ms":3500,"model":"claude-sonnet-4-5"}
+{"type":"tool_use","timestamp":"2025-06-15T09:00:10.000Z","session_id":"sess_abc123","cwd":"/home/user/my-project","model":"claude-sonnet-4-5"}
+{"type":"user","timestamp":"2025-06-15T09:05:00.000Z","session_id":"sess_abc123","cwd":"/home/user/my-project","message":{"role":"user","content":"Now add error handling"},"model":"claude-sonnet-4-5"}
+{"type":"assistant","timestamp":"2025-06-15T09:05:04.200Z","session_id":"sess_abc123","cwd":"/home/user/my-project","message":{"role":"assistant","content":"Here's the version with error handling..."},"usage":{"input_tokens":320,"output_tokens":1100,"cache_read_input_tokens":150,"cache_creation_input_tokens":0},"duration_ms":4200,"model":"claude-sonnet-4-5"}
+{"type":"error","timestamp":"2025-06-15T09:10:00.000Z","session_id":"sess_abc123","cwd":"/home/user/my-project","message":"Rate limit exceeded"}
+{"type":"session_end","timestamp":"2025-06-15T09:15:00.000Z","session_id":"sess_abc123","cwd":"/home/user/my-project"}
