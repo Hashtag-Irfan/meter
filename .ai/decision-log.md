@@ -163,4 +163,15 @@ This document tracks all critical design decisions made during the METER project
   2. **P1 (High)**: Directory-based Filters (RICE: 7.2) and Visual Standup Bulletins (RICE: 6.4) to drive invoicing utilities.
   3. **P2/P3**: Loop warnings and weekly summaries are scheduled for later phases.
 
+---
+
+## 21. Consensus METER Core v1.0 Blueprint (Vercel, GitHub, Cloudflare, Linear, Raycast, OpenAI)
+- **Status**: Approved.
+- **Context**: Consolidating feedback from a panel of engineers to review monorepo structures, tooling duplication, runtime performance, and parsing accuracy.
+- **Rationale**: We define the target v1.0 blueprint:
+  1. **Core Package Consolidation**: Introduce `@meter/core` to hold schema types and BPE tokenizer models.
+  2. **Vite Consolidation**: Unify dashboard and extension apps under a single Vite compiler.
+  3. **Web Worker Offloading**: Run log parsing and SQLite WASM inside a background Web Worker to preserve main thread framerates.
+  4. **Cross-Tab Sync**: Use the Broadcast Channel API to synchronize storage updates across active tabs in real-time.
+
 
