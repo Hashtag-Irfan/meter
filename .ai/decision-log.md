@@ -117,3 +117,10 @@ This document tracks all critical design decisions made during the METER project
   1. **Network-Free CSP**: Declare `connect-src 'none'` inside Manifest V3 extension pages, blocking all data exfiltration pathways.
   2. **WebCrypto Database Encryption**: Allow users to encrypt local IndexedDB files using AES-GCM-256 with key derivation (PBKDF2) from a volatile user passphrase.
   3. **Sandboxed Iframes**: Dynamic Javascript parsers are executed inside a hidden, privilege-free iframe to prevent access to DOM or extension APIs.
+
+---
+
+## 15. Extreme Performance Scaling (Database Sharding & Incremental Snapshots)
+- **Status**: Approved.
+- **Context**: Scaling METER to handle 1,000,000 events across 100 providers spanning 10 years of history.
+- **Rationale**: We implement chronological database sharding (splitting stores by year) to reduce index tree depths, and maintain a pre-aggregated `snapshots` table for daily/weekly/monthly metrics. This reduces dashboard query complexities from linear scans ($O(N)$) to instant lookups ($O(1)$) and avoids loading large datasets into RAM by utilizing streamed IndexedDB cursors.
