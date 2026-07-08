@@ -78,3 +78,10 @@ This document tracks all critical design decisions made during the METER project
 - **Status**: Approved.
 - **Context**: Standardizing communication patterns and method signatures across storage, analytics, provider registry, and extensions to prevent structural drift.
 - **Rationale**: We define strict TypeScript interfaces for storage repositories (`SessionsRepository`, `EventsRepository`) and stateless analytics engines (`calculateMetrics`, `generateTimeSeries`, `generateInsights`). Extension messaging uses declarative `ExtensionMessage` JSON envelopes, and local backup exports enforce a versioned JSON schema. The provider parser lifecycle tracks state transitions (`Unloaded` -> `Loaded` -> `Initialized` -> `Active` -> `Error`), guaranteeing sandbox isolation.
+
+---
+
+## 11. Open Source Branching, PR Workflows, and Commit Standards
+- **Status**: Approved.
+- **Context**: Managing contributions from developers without compromising git history cleanliness or codebase health.
+- **Rationale**: METER enforces Conventional Commits with specific scopes (`shared`, `storage`, `providers`, `analytics`, `dashboard`, `extension`, `website`) and adopts Trunk-Based Development. Release verification pipelines run pre-commit Husky hooks and CI gates (lint, typecheck, unit test execution). Pull requests require at least one maintainer review approval and 100% green status checks before merging.
