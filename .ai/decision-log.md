@@ -43,3 +43,13 @@ This document tracks all critical design decisions made during the METER project
 - **Status**: Approved.
 - **Context**: AI log files contain sensitive proprietary source code and raw prompts. Storing these raw contents locally exposes developers to data leakage if databases are extracted.
 - **Rationale**: We enforce a strict **Sanitization Guard** in the ingestion loop. Raw prompts, code snippets, and diff payloads are permanently stripped out *before* writing to IndexedDB. Furthermore, we decouple file-watching from parsing, ensuring provider plugins are environment-agnostic. Hot-swapping third-party plugins in the browser is restricted to **Declarative JSON Parsers** or executed inside sandboxed Web Workers to prevent malicious code execution, path traversal, or access to cookies and local storage.
+
+---
+
+## 7. Scaling to 1 Million Events (SQLite WASM, OPFS, LTTB, and Virtualization)
+- **Status**: Approved.
+- **Context**: Processing and displaying analytics charts for 1,000,000+ logged developer events causes severe main-thread lag and browser crashes.
+- **Rationale**: We adopt a multi-layered scaling architecture:
+  1. **SQLite OPFS (Origin Private File System)**: Stream IndexedDB records into SQLite WASM running inside a Web Worker, utilizing watermark tracking to load only new items. SQLite OPFS provides persistent relational indexing, bypassing slow JS map-reduce loops.
+  2. **LTTB Downsampling**: Downsample large time-series datasets to exactly 1,000 display points before sending messages to the main thread.
+  3. **Canvas Charts & UI Virtualization**: Render charts using canvas rendering to reduce DOM nodes, and virtualize event log lists to keep the DOM element count independent of database scale ($O(1)$ complexity).
