@@ -53,3 +53,14 @@ This document tracks all critical design decisions made during the METER project
   1. **SQLite OPFS (Origin Private File System)**: Stream IndexedDB records into SQLite WASM running inside a Web Worker, utilizing watermark tracking to load only new items. SQLite OPFS provides persistent relational indexing, bypassing slow JS map-reduce loops.
   2. **LTTB Downsampling**: Downsample large time-series datasets to exactly 1,000 display points before sending messages to the main thread.
   3. **Canvas Charts & UI Virtualization**: Render charts using canvas rendering to reduce DOM nodes, and virtualize event log lists to keep the DOM element count independent of database scale ($O(1)$ complexity).
+
+---
+
+## 8. Integrated Testing and Quality Assurance Framework
+- **Status**: Approved.
+- **Context**: Resolving how to validate IndexedDB stores, dynamic parser inputs, visual styling layouts, and Extension sandbox constraints without regressions.
+- **Rationale**: We set up a tiered verification pipeline:
+  1. **Vitest + fake-indexeddb**: Run in-memory repository tests on every push.
+  2. **Playwright Extension Test Container**: Simulates folder select/directory handles and browser side panel contexts in a mock Chromium runtime.
+  3. **Axe-core and Visual Regression Diffs**: Automated checks for WCAG 2.1 AA and light/dark theme layout shifts in Playwright.
+  4. **Release Gate Enforcement**: CI pipelines require 90%+ code coverage, 0 accessibility alerts, and < 0.05% visual diff threshold to compile a production bundle.
