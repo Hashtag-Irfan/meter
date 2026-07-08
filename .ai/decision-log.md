@@ -36,3 +36,10 @@ This document tracks all critical design decisions made during the METER project
 - **Status**: Approved.
 - **Context**: Deciding how to aggregate developer metrics and qualitative insights for chart rendering.
 - **Rationale**: To maximize performance and decoupling, `@meter/analytics` is implemented as a 100% pure, stateless, zero-side-effect library. It has no references to storage APIs or external states, operating purely on arrays of `Event` and `Session` objects. Time-series bucket calculation aligns to strict UTC boundaries, dynamically filling empty gaps with 0 values so that charting components (`Recharts`) can render continuous lines without formatting gaps or visual errors. Qualitative insights use local rule-based heuristics rather than AI/LLM layers to preserve privacy and speed.
+
+---
+
+## 6. Ingestion Sanitization and Sandbox Controls
+- **Status**: Approved.
+- **Context**: AI log files contain sensitive proprietary source code and raw prompts. Storing these raw contents locally exposes developers to data leakage if databases are extracted.
+- **Rationale**: We enforce a strict **Sanitization Guard** in the ingestion loop. Raw prompts, code snippets, and diff payloads are permanently stripped out *before* writing to IndexedDB. Furthermore, we decouple file-watching from parsing, ensuring provider plugins are environment-agnostic. Hot-swapping third-party plugins in the browser is restricted to **Declarative JSON Parsers** or executed inside sandboxed Web Workers to prevent malicious code execution, path traversal, or access to cookies and local storage.
