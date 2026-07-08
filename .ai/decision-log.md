@@ -153,3 +153,14 @@ This document tracks all critical design decisions made during the METER project
 - **Context**: Design specifications for community PR templates, security incident reporting, and standardized Commitlint rules.
 - **Rationale**: We configure explicit Conventional Commit rules with strict type and scope validations, establish standard PR checklists (lint, typecheck, WCAG 2.1 AA audits), and formulate security reporting channels to manage vulnerabilities privately prior to coordinated disclosures.
 
+---
+
+## 20. RICE-Based Backlog Prioritization & User Workflows
+- **Status**: Approved.
+- **Context**: Determining feature prioritization order for METER's roadmap across five target personas (Freelancer, Senior, Maintainer, Founder, Enterprise).
+- **Rationale**: We apply the RICE framework (Reach, Impact, Confidence, Effort) to structure execution targets:
+  1. **P0 (Critical)**: In-Memory Write Buffer (RICE: 13.5) and Ingestion Sanitization Guard (RICE: 10.0) are prioritized first to resolve performance bottlenecks and privacy risks.
+  2. **P1 (High)**: Directory-based Filters (RICE: 7.2) and Visual Standup Bulletins (RICE: 6.4) to drive invoicing utilities.
+  3. **P2/P3**: Loop warnings and weekly summaries are scheduled for later phases.
+
+
