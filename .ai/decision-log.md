@@ -124,3 +124,10 @@ This document tracks all critical design decisions made during the METER project
 - **Status**: Approved.
 - **Context**: Scaling METER to handle 1,000,000 events across 100 providers spanning 10 years of history.
 - **Rationale**: We implement chronological database sharding (splitting stores by year) to reduce index tree depths, and maintain a pre-aggregated `snapshots` table for daily/weekly/monthly metrics. This reduces dashboard query complexities from linear scans ($O(N)$) to instant lookups ($O(1)$) and avoids loading large datasets into RAM by utilizing streamed IndexedDB cursors.
+
+---
+
+## 16. QA Verification Framework & Provider Log Snapshot Testing
+- **Status**: Approved.
+- **Context**: Guarding against regressions inside provider parsing adapters when coding assistants update their log schemas.
+- **Rationale**: We enforce strict schema snapshot testing in Vitest, matching parser output structures against verified log fixtures. Playwright automates extension testing by mocking `window.showDirectoryPicker` to return mock directory handles, and axe-core checks WCAG 2.1 AA compliance during E2E executions. Production builds require meeting strict release gates (branch coverage bounds, < 0.05% visual diff, and < 300ms query performance).
