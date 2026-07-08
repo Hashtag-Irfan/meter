@@ -131,3 +131,10 @@ This document tracks all critical design decisions made during the METER project
 - **Status**: Approved.
 - **Context**: Guarding against regressions inside provider parsing adapters when coding assistants update their log schemas.
 - **Rationale**: We enforce strict schema snapshot testing in Vitest, matching parser output structures against verified log fixtures. Playwright automates extension testing by mocking `window.showDirectoryPicker` to return mock directory handles, and axe-core checks WCAG 2.1 AA compliance during E2E executions. Production builds require meeting strict release gates (branch coverage bounds, < 0.05% visual diff, and < 300ms query performance).
+
+---
+
+## 17. Senior Component Specifications & Interactive HTML Contracts
+- **Status**: Approved.
+- **Context**: Documenting the explicit HTML structure, Tailwind utility lists, and focus ring offset constants for reusable components (Metric Cards, Session Cards, Chronological Timelines) to prevent style drift across layout packages.
+- **Rationale**: We specify high-fidelity component layouts featuring absolute-positioned weekly sparklines, grid-aligned statistics metrics, and vertical step chronological indicators. This locks down focus-visible outline states, key mappings for dialog loops, and sliding CSS transitions, guaranteeing a premium developer experience.
