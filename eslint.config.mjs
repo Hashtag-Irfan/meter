@@ -3,9 +3,20 @@ import js from "@eslint/js";
 import tsPlugin from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
 import importPlugin from "eslint-plugin-import";
+import globals from "globals";
 
 /** @type {import("eslint").Linter.Config[]} */
 export default [
+  {
+    ignores: [
+      "**/dist/**",
+      "**/.next/**",
+      "**/node_modules/**",
+      "**/vitest.config.ts",
+      "**/tailwind.config.ts",
+      "eslint.config.mjs"
+    ]
+  },
   js.configs.recommended,
   {
     files: ["**/*.{ts,tsx}"],
@@ -13,6 +24,11 @@ export default [
       parser: tsParser,
       parserOptions: {
         projectService: true,
+      },
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        ...globals.webextensions,
       },
     },
     plugins: {

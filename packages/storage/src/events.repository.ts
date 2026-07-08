@@ -1,9 +1,9 @@
-import type { IDBPDatabase } from "idb";
 
-import type { Event, EventFilter } from "@meter/shared";
 import { STORE_NAMES } from "@meter/shared";
 
 import type { MeterDBSchema } from "./db.js";
+import type { Event, EventFilter } from "@meter/shared";
+import type { IDBPDatabase } from "idb";
 
 // ─── Events Repository ────────────────────────────────────────────────────────
 

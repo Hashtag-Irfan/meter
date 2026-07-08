@@ -1,9 +1,9 @@
-import type { IDBPDatabase } from "idb";
 
-import type { Session, SessionFilter } from "@meter/shared";
 import { STORE_NAMES } from "@meter/shared";
 
 import type { MeterDBSchema } from "./db.js";
+import type { Session, SessionFilter } from "@meter/shared";
+import type { IDBPDatabase } from "idb";
 
 // ─── Sessions Repository ──────────────────────────────────────────────────────
 

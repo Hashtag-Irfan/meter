@@ -1,9 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { PROVIDER_LOG_DIRS, extractProjectPath, isSupportedLogFile } from "../../paths.js";
+
 import type { ParsedEvent, ProviderPlugin } from "@meter/shared";
 
-import { PROVIDER_LOG_DIRS, extractProjectPath, isSupportedLogFile } from "../../paths.js";
 
 // ─── Claude Code Log Format ───────────────────────────────────────────────────
 //
@@ -231,7 +232,7 @@ export class ClaudeCodeProvider implements ProviderPlugin {
    * to preserve privacy — we only store metrics.
    */
   private sanitizePayload(entry: ClaudeRawEntry): Record<string, unknown> {
-    const { message: _msg, usage, duration_ms, type, timestamp, ...rest } = entry;
+    const { message: _msg, usage, duration_ms, type: _type, timestamp: _timestamp, ...rest } = entry;
     return {
       model: rest.model,
       session_id: rest.session_id,

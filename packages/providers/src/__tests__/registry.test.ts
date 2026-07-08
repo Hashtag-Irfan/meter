@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { ProviderRegistry } from "../registry.js";
 import { ClaudeCodeProvider } from "../adapters/claude-code/index.js";
 import { CodexProvider } from "../adapters/codex/index.js";
+import { ProviderRegistry } from "../registry.js";
 
 describe("ProviderRegistry", () => {
   it("registers and retrieves a provider", () => {

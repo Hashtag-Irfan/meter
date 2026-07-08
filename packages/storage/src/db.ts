@@ -1,9 +1,9 @@
-import type { DBSchema, IDBPDatabase } from "idb";
+
+import { DB_NAME, DB_VERSION, STORE_NAMES } from "@meter/shared";
+import { openDB } from "idb";
 
 import type { Event, Session, Snapshot } from "@meter/shared";
-import { DB_NAME, DB_VERSION, STORE_NAMES } from "@meter/shared";
-
-import { openDB } from "idb";
+import type { DBSchema, IDBPDatabase } from "idb";
 
 // ─── IndexedDB Schema ─────────────────────────────────────────────────────────
 
@@ -60,7 +60,7 @@ let _db: MeterDB | null = null;
  *
  * @param factory - Optional IDBFactory override (used in tests with fake-indexeddb)
  */
-export async function openMeterDB(factory?: IDBFactory): Promise<MeterDB> {
+export async function openMeterDB(_factory?: IDBFactory): Promise<MeterDB> {
   if (_db) return _db;
 
   _db = await openDB<MeterDBSchema>(DB_NAME, DB_VERSION, {

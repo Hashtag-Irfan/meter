@@ -1,3 +1,6 @@
-// @meter/analytics — placeholder
-// Full implementation in Milestone 4.
-export {};
+// @meter/analytics — public API
+
+export { calculateEventCost, calculateMetrics } from "./metrics.js";
+export { generateTimeSeries } from "./time-series.js";
+export { generateInsights, generateDailyStandup } from "./insights.js";
+export type { Insight } from "./insights.js";

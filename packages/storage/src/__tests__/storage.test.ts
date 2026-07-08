@@ -1,11 +1,12 @@
 import "fake-indexeddb/auto";
+import { generateId } from "@meter/shared";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import type { Event, Session, Snapshot } from "@meter/shared";
-import { generateId } from "@meter/shared";
-
-import { StorageService } from "../storage.service.js";
 import { closeMeterDB, openMeterDB } from "../db.js";
+import { StorageService } from "../storage.service.js";
+
+import type { Event, Session, Snapshot } from "@meter/shared";
+
 
 // ─── Test Fixtures ────────────────────────────────────────────────────────────
 
