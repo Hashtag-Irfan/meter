@@ -11,7 +11,7 @@ import {
   groupBy,
   ok,
   truncateToPeriod,
-} from "../src/index.js";
+} from "../index.js";
 
 describe("constants", () => {
   it("should include the three initial providers", () => {

@@ -19,6 +19,7 @@ export function clamp(value: number, min: number, max: number): number {
 
 /**
  * Truncate a unix timestamp (ms) to the start of a given period.
+ * All truncation is done in UTC for consistency across timezones.
  */
 export function truncateToPeriod(
   timestampMs: number,
@@ -27,20 +28,20 @@ export function truncateToPeriod(
   const d = new Date(timestampMs);
   switch (period) {
     case "hour":
-      d.setMinutes(0, 0, 0);
+      d.setUTCMinutes(0, 0, 0);
       break;
     case "day":
-      d.setHours(0, 0, 0, 0);
+      d.setUTCHours(0, 0, 0, 0);
       break;
     case "week": {
-      const day = d.getDay(); // 0 = Sunday
-      d.setDate(d.getDate() - day);
-      d.setHours(0, 0, 0, 0);
+      const day = d.getUTCDay(); // 0 = Sunday
+      d.setUTCDate(d.getUTCDate() - day);
+      d.setUTCHours(0, 0, 0, 0);
       break;
     }
     case "month":
-      d.setDate(1);
-      d.setHours(0, 0, 0, 0);
+      d.setUTCDate(1);
+      d.setUTCHours(0, 0, 0, 0);
       break;
   }
   return d.getTime();
