@@ -85,3 +85,14 @@ This document tracks all critical design decisions made during the METER project
 - **Status**: Approved.
 - **Context**: Managing contributions from developers without compromising git history cleanliness or codebase health.
 - **Rationale**: METER enforces Conventional Commits with specific scopes (`shared`, `storage`, `providers`, `analytics`, `dashboard`, `extension`, `website`) and adopts Trunk-Based Development. Release verification pipelines run pre-commit Husky hooks and CI gates (lint, typecheck, unit test execution). Pull requests require at least one maintainer review approval and 100% green status checks before merging.
+
+---
+
+## 12. User Persona Metrics & Journey Maps
+- **Status**: Approved.
+- **Context**: Tailoring dashboard visualizations, daily bulletins, and alerts to address different developer archetypes.
+- **Rationale**: Based on UX interviews, we align METER's analytics focus directly with user personas:
+  1. **Senior Dev / Startup Founder**: Prioritize USD spend limits and infinite prompt loop warnings.
+  2. **Freelancer / Agency**: Prioritize project-level workspace filters and exportable Markdown standup bulletins.
+  3. **Junior Dev**: Focus on reject/accept ratio metrics to diagnose learning efficiency.
+  This structures the database index designs and visualization priorities.
