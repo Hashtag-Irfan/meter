@@ -64,3 +64,10 @@ This document tracks all critical design decisions made during the METER project
   2. **Playwright Extension Test Container**: Simulates folder select/directory handles and browser side panel contexts in a mock Chromium runtime.
   3. **Axe-core and Visual Regression Diffs**: Automated checks for WCAG 2.1 AA and light/dark theme layout shifts in Playwright.
   4. **Release Gate Enforcement**: CI pipelines require 90%+ code coverage, 0 accessibility alerts, and < 0.05% visual diff threshold to compile a production bundle.
+
+---
+
+## 9. Design System Tokens & Unified CSS Property Architecture
+- **Status**: Approved.
+- **Context**: Designing the dashboard visually to look modern, vibrant, and cohesive while preventing style drift.
+- **Rationale**: We establish a unified CSS custom property architecture centered around a dark-mode-first HSL palette. Core layouts rely on glassmorphism visual styling (blur filters, fine border cards, backdrop washes) to look clean and premium. All interactive components must implement WCAG 2.1 AA contrast standards, keyboard focus rings, and screen-reader `aria-` attributes, with styling adjustments respecting users' reduced-motion preferences.
