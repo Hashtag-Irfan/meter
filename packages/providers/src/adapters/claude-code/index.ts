@@ -1,15 +1,11 @@
-import fs from "node:fs";
-import path from "node:path";
+import { extractProjectPath } from "../../paths.js";
 
-import { PROVIDER_LOG_DIRS, extractProjectPath, isSupportedLogFile } from "../../paths.js";
-
-import type { ParsedEvent, ProviderPlugin } from "@meter/shared";
-
+import type { ParsedEvent, ProviderParser } from "@meter/shared";
 
 // ─── Claude Code Log Format ───────────────────────────────────────────────────
 //
 // Claude Code writes one JSON object per line (JSONL) to:
-//   ~/.claude/logs/<hash>_<project>.jsonl
+//   ~/.claude/projects/<hash>_<project>.jsonl
 //
 // Each line is one of several message types. The schema below covers
 // what Claude Code 1.x emits. Fields may evolve across versions — the
@@ -42,47 +38,17 @@ interface ClaudeRawEntry {
 }
 
 // ─── Claude Code Provider ─────────────────────────────────────────────────────
+//
+// This adapter is a PURE parser: it only transforms a raw string into
+// `ParsedEvent[]`. It never touches the filesystem or OS — the host reads
+// the file and passes the text in (see ADR #2).
 
-export class ClaudeCodeProvider implements ProviderPlugin {
+export class ClaudeCodeProvider implements ProviderParser {
   readonly id = "claude-code" as const;
   readonly name = "Claude Code";
   readonly version = "1.0.0";
   readonly icon =
     "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMkM2LjQ3NyAyIDIgNi40NzcgMiAxMnM0LjQ3NyAxMCAxMCAxMCAxMC00LjQ3NyAxMC0xMFMxNy41MjMgMiAxMiAyem0wIDE4Yy00LjQxOCAwLTgtMy41ODItOC04czMuNTgyLTggOC04IDggMy41ODIgOCA4LTMuNTgyIDgtOCA4eiIgZmlsbD0iI0Q5N0I0NiIvPjwvc3ZnPg==";
-
-  // ── ProviderPlugin interface ──────────────────────────────────────────────
-
-  async detect(): Promise<boolean> {
-    const dirs = PROVIDER_LOG_DIRS["claude-code"] ?? [];
-    return dirs.some((dir) => {
-      try {
-        return fs.existsSync(dir);
-      } catch {
-        return false;
-      }
-    });
-  }
-
-  async getLogPaths(): Promise<string[]> {
-    const dirs = PROVIDER_LOG_DIRS["claude-code"] ?? [];
-    const logFiles: string[] = [];
-
-    for (const dir of dirs) {
-      try {
-        if (!fs.existsSync(dir)) continue;
-        const entries = fs.readdirSync(dir, { withFileTypes: true });
-        for (const entry of entries) {
-          if (entry.isFile() && isSupportedLogFile(entry.name)) {
-            logFiles.push(path.join(dir, entry.name));
-          }
-        }
-      } catch {
-        // Directory unreadable — skip silently
-      }
-    }
-
-    return logFiles;
-  }
 
   async parse(raw: string, filePath: string): Promise<ParsedEvent[]> {
     const lines = raw.split("\n").filter((l) => l.trim().length > 0);
@@ -102,44 +68,6 @@ export class ClaudeCodeProvider implements ProviderPlugin {
     }
 
     return events;
-  }
-
-  watch(paths: string[], onChange: (events: ParsedEvent[]) => void): () => void {
-    const watchers = paths.map((filePath) => {
-      let lastSize = 0;
-      try {
-        lastSize = fs.statSync(filePath).size;
-      } catch {
-        // File doesn't exist yet — start from 0
-      }
-
-      const watcher = fs.watch(filePath, { persistent: false }, async (event) => {
-        if (event !== "change") return;
-        try {
-          const stat = fs.statSync(filePath);
-          if (stat.size <= lastSize) return; // No new content
-
-          // Read only the new bytes
-          const fd = fs.openSync(filePath, "r");
-          const buffer = Buffer.alloc(stat.size - lastSize);
-          fs.readSync(fd, buffer, 0, buffer.length, lastSize);
-          fs.closeSync(fd);
-          lastSize = stat.size;
-
-          const newContent = buffer.toString("utf-8");
-          const newEvents = await this.parse(newContent, filePath);
-          if (newEvents.length > 0) {
-            onChange(newEvents);
-          }
-        } catch {
-          // File read error — log but don't crash the watcher
-        }
-      });
-
-      return watcher;
-    });
-
-    return () => watchers.forEach((w) => w.close());
   }
 
   // ── Private parsing logic ─────────────────────────────────────────────────
@@ -232,10 +160,17 @@ export class ClaudeCodeProvider implements ProviderPlugin {
    * to preserve privacy — we only store metrics.
    */
   private sanitizePayload(entry: ClaudeRawEntry): Record<string, unknown> {
-    const { message: _msg, usage, duration_ms, type: _type, timestamp: _timestamp, ...rest } = entry;
+    const {
+      message: _msg,
+      usage,
+      duration_ms,
+      type: _type,
+      timestamp: _timestamp,
+      ...rest
+    } = entry;
     return {
-      model: rest.model,
-      session_id: rest.session_id,
+      model: rest["model"],
+      session_id: rest["session_id"],
       ...(usage ? { usage } : {}),
       ...(duration_ms !== undefined ? { duration_ms } : {}),
     };

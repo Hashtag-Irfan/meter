@@ -9,22 +9,10 @@
     "default_path": "sidepanel.html"
   },
   "action": {
-    "default_title": "Open METER",
-    "default_icon": {
-      "16": "icons/icon-16.png",
-      "32": "icons/icon-32.png",
-      "48": "icons/icon-48.png",
-      "128": "icons/icon-128.png"
-    }
-  },
-  "icons": {
-    "16": "icons/icon-16.png",
-    "32": "icons/icon-32.png",
-    "48": "icons/icon-48.png",
-    "128": "icons/icon-128.png"
+    "default_title": "Open METER"
   },
   "background": {
-    "service_worker": "background.js",
+    "service_worker": "src/background.ts",
     "type": "module"
   }
 }

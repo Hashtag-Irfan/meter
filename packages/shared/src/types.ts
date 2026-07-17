@@ -69,8 +69,100 @@ export interface AggregatedMetrics {
 // ─── Plugin System Types ──────────────────────────────────────────────────────
 
 /**
+ * The operating system the host is running on.
+ * Used to resolve platform-specific log directories without touching Node APIs.
+ */
+export type Platform = "macos" | "linux" | "windows";
+
+/**
+ * A minimal, environment-agnostic filesystem/OS surface.
+ *
+ * Provider packages must NEVER import `node:fs`, `node:os`, or `node:path`
+ * directly (see ADR #2). Instead, the active host (CLI, Extension, Desktop
+ * app) injects a `HostEnv` so the same provider code runs in browsers,
+ * extensions, and Node. Every host-bound capability is expressed as a
+ * function on this interface.
+ */
+export interface HostEnv {
+  /** Current platform. */
+  readonly platform: Platform;
+  /** Returns the user's home directory. */
+  homedir(): string;
+  /** Returns the platform application-data directory (e.g. %APPDATA%). */
+  appData(): string;
+  /** Synchronous existence check for a path. */
+  existsSync(path: string): boolean;
+  /** List file names inside a directory. */
+  readdirSync(dir: string): string[];
+  /** Stat a file, returning at least its byte size. */
+  statSync(path: string): { size: number };
+  /** Read a file's full contents as a UTF-8 string. */
+  readFileSync(path: string): string;
+  /**
+   * Subscribe to updates on a single file. Returns a cleanup function.
+   * Optional — hosts that do not support file watching may omit it, in
+   * which case `watch` degrades to a no-op.
+   */
+  watchFile?(path: string, onUpdate: () => void): () => void;
+}
+
+/**
+ * A single log directory pattern expressed relative to a resolution root.
+ * Pure data — no path joining happens at module load time.
+ */
+export interface LogDirPattern {
+  /** Which platform this pattern applies to. `"all"` matches everywhere. */
+  os: Platform | "all";
+  /** Resolution root for the segments. */
+  base: "home" | "appdata";
+  /** Path segments appended to the base (order matters). */
+  segments: string[];
+}
+
+/**
+ * A PURE provider parser. No filesystem, no OS, no network.
+ * The host reads raw files and passes the text here.
+ */
+export interface ProviderParser {
+  /** Stable machine-readable identifier. */
+  readonly id: ProviderId;
+  /** Human-readable display name. */
+  readonly name: string;
+  /** Parser version, semver. */
+  readonly version: string;
+  /** URL or data-URI for the provider icon. */
+  readonly icon: string;
+  /**
+   * Parse raw log content into normalized ParsedEvents.
+   * @param raw      Raw file content as a string.
+   * @param filePath Source file path (used only for project-path heuristics).
+   */
+  parse(raw: string, filePath: string): Promise<ParsedEvent[]>;
+}
+
+/**
+ * A pure, declarative description of a provider. This is the "type
+ * configuration" the registry is built from — no behavior beyond the
+ * contained `parser` and optional `detect` closure. Adding a provider is
+ * purely a data change here.
+ */
+export interface ProviderDefinition {
+  id: ProviderId;
+  name: string;
+  icon: string;
+  /** The pure parsing adapter. */
+  parser: ProviderParser;
+  /** Where this provider stores logs, per platform. */
+  logDirs: LogDirPattern[];
+  /** File extensions METER should ingest for this provider. */
+  fileExtensions: string[];
+  /** Optional environment-aware detection. Defaults to directory existence. */
+  detect?(env: HostEnv): Promise<boolean>;
+}
+
+/**
  * Normalized event output from a provider parser.
- * This is what every ProviderPlugin.parse() must return.
+ * This is what every ProviderParser.parse() must return.
  */
 export interface ParsedEvent {
   /** Provider-native ID (used for deduplication) */
@@ -85,42 +177,37 @@ export interface ParsedEvent {
 }
 
 /**
- * The contract every provider plugin must implement.
- * Add a new provider by creating a class that satisfies this interface.
+ * The full, host-facing provider contract. It extends the pure
+ * `ProviderParser` with environment-bound capabilities that require a
+ * `HostEnv` (filesystem access, OS info). Because every host-bound method
+ * receives its `HostEnv` as an argument, implementations stay free of
+ * `node:*` imports and remain web-safe.
+ *
+ * Prefer `ProviderDefinition` + the registry for configuration; this
+ * interface is the runtime shape a Node/CLI host wraps around a definition
+ * via `createHostProvider`.
  */
-export interface ProviderPlugin {
-  /** Stable machine-readable identifier */
-  readonly id: ProviderId;
-  /** Human-readable display name */
-  readonly name: string;
-  /** Plugin version, semver */
-  readonly version: string;
-  /** URL or data-URI for the provider icon */
-  readonly icon: string;
-
+export interface ProviderPlugin extends ProviderParser {
   /**
    * Detect whether this provider is installed on the current machine.
    * Should be fast and non-destructive.
    */
-  detect(): Promise<boolean>;
+  detect(env: HostEnv): Promise<boolean>;
 
   /**
-   * Return the absolute paths to log files / directories for this provider.
+   * Return the absolute paths to log files for this provider.
    */
-  getLogPaths(): Promise<string[]>;
+  getLogPaths(env: HostEnv): Promise<string[]>;
 
   /**
-   * Parse raw log content into normalized ParsedEvents.
-   * @param raw   - Raw file content
-   * @param filePath - Source file path (for error context)
-   */
-  parse(raw: string, filePath: string): Promise<ParsedEvent[]>;
-
-  /**
-   * Watch log paths for new entries.
+   * Watch log paths for new entries and emit parsed events.
    * @returns Cleanup function — call to stop watching.
    */
-  watch(paths: string[], onChange: (events: ParsedEvent[]) => void): () => void;
+  watch(
+    paths: string[],
+    onChange: (events: ParsedEvent[]) => void,
+    env: HostEnv,
+  ): () => void;
 }
 
 // ─── Storage Types ────────────────────────────────────────────────────────────

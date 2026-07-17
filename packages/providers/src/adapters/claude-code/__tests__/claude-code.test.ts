@@ -1,14 +1,16 @@
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 import { beforeEach, describe, expect, it } from "vitest";
 
+import { PROVIDERS } from "../../../definitions.js";
+import { createHostProvider } from "../../../host.js";
 import { ClaudeCodeProvider } from "../index.js";
+
+import type { HostEnv, ParsedEvent } from "@meter/shared";
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = path.join(__dirname, "../__fixtures__");
 
 function readFixture(name: string): string {
@@ -50,7 +52,9 @@ describe("ClaudeCodeProvider", () => {
     it("parses a prompt event correctly", () => {
       const prompt = events.find((e) => e.type === "prompt");
       expect(prompt).toBeDefined();
-      expect(prompt?.timestamp).toBe(new Date("2025-06-15T09:00:05.000Z").getTime());
+      expect(prompt?.timestamp).toBe(
+        new Date("2025-06-15T09:00:05.000Z").getTime(),
+      );
       expect(prompt?.tokensIn).toBeNull(); // user messages have no usage
     });
 
@@ -74,7 +78,9 @@ describe("ClaudeCodeProvider", () => {
     it("parses a session_start event", () => {
       const start = events.find((e) => e.type === "session_start");
       expect(start).toBeDefined();
-      expect(start?.timestamp).toBe(new Date("2025-06-15T09:00:00.000Z").getTime());
+      expect(start?.timestamp).toBe(
+        new Date("2025-06-15T09:00:00.000Z").getTime(),
+      );
     });
 
     it("parses a session_end event", () => {
@@ -152,7 +158,6 @@ describe("ClaudeCodeProvider", () => {
     });
 
     it("does not throw on malformed JSON lines", () => {
-      // If we get here, no exception was thrown
       expect(events).toBeDefined();
     });
 
@@ -173,7 +178,6 @@ describe("ClaudeCodeProvider", () => {
     it("handles missing usage gracefully (null tokens)", () => {
       const promptEvents = events.filter((e) => e.type === "prompt");
       promptEvents.forEach((e) => {
-        // Prompts never have usage in this fixture
         expect(e.tokensOut).toBeNull();
       });
     });
@@ -186,15 +190,79 @@ describe("ClaudeCodeProvider", () => {
     });
 
     it("returns empty array for whitespace-only input", async () => {
-      const result = await provider.parse("   \n  \n  ", "/logs/empty.jsonl");
+      const result = await provider.parse(
+        "   \n  \n  ",
+        "/logs/empty.jsonl",
+      );
       expect(result).toEqual([]);
     });
   });
 
-  describe("watch — cleanup", () => {
+  describe("host provider — watch", () => {
+    function controllableEnv(initial: string, filePath: string) {
+      let content = initial;
+      const watchers = new Map<string, () => void>();
+      const env: HostEnv = {
+        platform: "linux",
+        homedir: () => "/home/user",
+        appData: () => "/x",
+        existsSync: (p) => p === filePath,
+        readdirSync: () => [path.basename(filePath)],
+        statSync: () => ({ size: content.length }),
+        readFileSync: () => content,
+        watchFile: (p, cb) => {
+          watchers.set(p, cb);
+          return () => watchers.delete(p);
+        },
+      };
+      return {
+        env,
+        append: (more: string) => {
+          content += more;
+          watchers.get(filePath)?.();
+        },
+      };
+    }
+
+    it("emits parsed events when a watched file gains new content", async () => {
+      const filePath = "/home/user/.claude/projects/sess.jsonl";
+      const { env, append } = controllableEnv("", filePath);
+      const host = createHostProvider(PROVIDERS["claude-code"]);
+
+      const received: ParsedEvent[] = [];
+      const stop = host.watch(
+        [filePath],
+        (e: ParsedEvent[]) => received.push(...e),
+        env,
+      );
+
+      append(
+        '{"type":"user","timestamp":"2025-06-15T09:00:00.000Z","cwd":"/p"}\n',
+      );
+      await new Promise((r) => setTimeout(r, 0));
+
+      expect(received).toHaveLength(1);
+      expect(received[0]!.type).toBe("prompt");
+
+      stop();
+    });
+
     it("returns a cleanup function that can be called without error", () => {
-      const cleanup = provider.watch([], () => {});
-      expect(() => cleanup()).not.toThrow();
+      const host = createHostProvider(PROVIDERS["claude-code"]);
+      const stop = host.watch([], () => {}, fakeEnv());
+      expect(() => stop()).not.toThrow();
     });
   });
 });
+
+function fakeEnv(): HostEnv {
+  return {
+    platform: "linux",
+    homedir: () => "/home/user",
+    appData: () => "/home/user/AppData",
+    existsSync: () => false,
+    readdirSync: () => [],
+    statSync: () => ({ size: 0 }),
+    readFileSync: () => "",
+  };
+}

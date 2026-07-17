@@ -1,7 +1,8 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "lib": ["WebWorker", "ES2022"],
+    "lib": ["WebWorker", "DOM", "ES2022"],
+    "jsx": "react-jsx",
     "rootDir": "src",
     "outDir": "dist"
   },
